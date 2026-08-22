@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0f">
+<title>הכסף שלי</title>
+<style>
+:root{--bg:#080a0f;--card:#121620;--card2:#181e2a;--line:#293140;--text:#f7f8fb;--muted:#929aaa;--purple:#7c5cff;--green:#39d98a;--red:#ff5d6c}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0e1119,#080a0f 50%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:calc(18px + env(safe-area-inset-top)) 15px calc(80px + env(safe-area-inset-bottom))}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.eyebrow,.sub,.muted{color:var(--muted);font-size:12px}h1{font-size:30px;margin:3px 0;letter-spacing:-1px}
+.badge{font-size:11px;background:#1c2230;border:1px solid #30384a;border-radius:99px;padding:7px 10px}
+.hero{background:radial-gradient(circle at 80% 0,#30235f,transparent 43%),linear-gradient(145deg,#181d2b,#10131b);border:1px solid #2a3140;border-radius:25px;padding:21px;box-shadow:0 18px 55px #0006}
+.big{font-size:40px;font-weight:850;letter-spacing:-1.5px;margin:4px 0 17px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat,.mini{background:#ffffff08;border:1px solid #ffffff0d;border-radius:14px;padding:12px}.stat b,.mini b{display:block;font-size:18px;margin-top:4px}
+.section{margin-top:18px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.head h2{font-size:18px;margin:0}.head button{font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:14px;margin-bottom:9px}.holding{display:flex;gap:11px;align-items:center}.logo{width:44px;height:44px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}.grow{flex:1;min-width:0}.name{font-weight:750}.right{text-align:left}.value{font-weight:800}.green{color:var(--green)}.red{color:var(--red)}
+.progress{height:6px;background:#252b37;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;background:linear-gradient(90deg,#6b50ff,#a18cff);border-radius:99px}
+.search{width:100%;background:#11151e;border:1px solid #303746;border-radius:13px;color:#fff;padding:12px;font-size:16px;margin-bottom:9px}
+button{border:0;border-radius:12px;padding:11px 14px;font-weight:750;font-size:14px;cursor:pointer}.primary{background:#fff;color:#0a0c10}.secondary{background:#202735;color:#fff;border:1px solid #30384a}.danger{background:#2a151b;color:#ff9ba4;border:1px solid #4b232c}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{margin-bottom:10px}label{font-size:12px;color:#9ca5b5}input,select{width:100%;margin-top:5px;background:#0c1017;color:#fff;border:1px solid #303746;border-radius:11px;padding:11px;font-size:16px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.note{font-size:12px;color:#858e9f;line-height:1.5}
+.modal{display:none;position:fixed;inset:0;background:#000a;z-index:10;align-items:flex-end}.modal.show{display:flex}.sheet{width:100%;max-width:760px;margin:auto;background:#151922;border:1px solid #303746;border-radius:25px 25px 0 0;padding:17px 15px calc(20px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheettop{display:flex;justify-content:space-between;align-items:center}.close{width:38px;height:38px;padding:0;border-radius:50%;background:#282f3b;color:#fff}
+.watchrow{display:flex;align-items:center;gap:10px}.watchrow .logo{width:40px;height:40px}.watchrow .grow{overflow:hidden}.price{font-weight:800}.watchgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toast{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#f5f7fb;color:#0b0d12;padding:10px 16px;border-radius:99px;font-size:13px;font-weight:750;z-index:30}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="header"><div><div class="eyebrow">המרכז הכלכלי שלך</div><h1>הכסף שלי 💰</h1></div><span class="badge">שמירה במכשיר</span></header>
+
+<section class="hero"><div class="muted">הון כולל</div><div id="net" class="big">₪0</div><div class="grid"><div class="stat"><div class="muted">תיק השקעות</div><b id="pv">₪0</b></div><div class="stat"><div class="muted">מחוץ לשוק</div><b id="outside">₪0</b></div></div></section>
+
+<section class="section"><div class="head"><h2>📈 התיק שלי</h2><button class="secondary" onclick="openHolding()">＋ השקעה</button></div><div id="holdings"></div></section>
+
+<section class="section"><div class="head"><h2>⭐ מניות מפורסמות</h2><span class="muted">מחיר אחרון שנמצא</span></div>
+<input class="search" id="search" placeholder="חפש מניה..." oninput="renderWatch()"><div id="watch"></div>
+<p class="note">המחירים הם שערי שוק אחרונים שמצאתי, ולא מתעדכנים אוטומטית בתוך הקובץ. ביום מסחר הם יכולים להשתנות כל הזמן.</p></section>
+
+<section class="section"><div class="head"><h2>💵 כסף מחוץ לשוק</h2><button class="secondary" onclick="openMoney()">✎ עריכה</button></div>
+<div class="grid"><div class="card mini"><div class="muted">עו״ש</div><b id="checking">₪0</b></div><div class="card mini"><div class="muted">מזומן</div><b id="cash">₪0</b></div><div class="card mini"><div class="muted">פיקדונות</div><b id="dep">₪0</b></div><div class="card mini"><div class="muted">חייבים לי</div><b id="rec">₪0</b></div><div class="card mini"><div class="muted">Bit</div><b id="bit">₪0</b></div><div class="card mini"><div class="muted">חיסכון לכל ילד</div><b id="child">₪0</b></div></div></section>
+
+<section class="section"><div class="head"><h2>🎯 היעדים שלי</h2><button class="secondary" onclick="openGoal()">＋ יעד</button></div><div id="goals"></div></section>
+
+<section class="section"><div class="card"><div class="actions"><button class="primary" onclick="backup()">📤 גיבוי</button><button class="secondary" onclick="fixIsraeliPrices()">🇮🇱 תקן מחירי אגורות</button><button class="danger" onclick="resetAll()">איפוס הכול</button></div><p class="note">הנתונים נשמרים מקומית בדפדפן. אין חיבור לחשבון הבנק או לברוקר. לפני שימוש אמיתי, בדוק את השערים מול מקור מסחר עדכני.</p></div></section>
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheettop"><h2 id="mtitle">עדכון</h2><button class="close" onclick="closeModal()">×</button></div><div id="form"></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const watchData=[
+["NVDA","NVIDIA",214.72],["AAPL","Apple",309.35],["MSFT","Microsoft",481.15],["AMZN","Amazon",260.11],["GOOG","Alphabet",338.20],["GOOGL","Alphabet A",342.0],["META","Meta",545.83],["TSLA","Tesla",411.82],["AVGO","Broadcom",364.50],["ADBE","Adobe",275.30],["ORCL","Oracle",146.47],["AMD","AMD",0],["COST","Costco",0],["NFLX","Netflix",0],["QCOM","Qualcomm",0]];
+const initial={holdings:[
+{s:"1146570",name:"קסם ETF ת״א 35",q:200,b:0,p:410.70,c:"₪",unit:"agorot",fx:1},
+{s:"1159250",name:"iShares S&P 500",q:15,b:0,p:247220,c:"₪",unit:"agorot",fx:1},
+{s:"MOS",name:"Mosaic",q:7,b:0,p:21.61,c:"$",fx:3.4}],
+money:{checking:3037.48,cash:150,deposits:851.18,receivable:2782,bit:450,child:23000},goals:[{name:"מיליון ₪",target:1000000}]};
+let state=JSON.parse(localStorage.getItem("myMoneyFinal")||"null")||initial;
+
+// Migration: Israeli market quotes are commonly stored in agorot.
+// Preserve the raw number (e.g. 247220) but mark the holding as agorot,
+// so calculations use 2472.20 ₪. This also fixes data already saved
+// in the browser before the unit selector was added.
+state.holdings.forEach(x=>{
+  if(x.c==="₪"){
+    if(x.s==="1159250" || x.s==="1146570" || (!x.unit && (Math.abs(+x.p)>=10000 || Math.abs(+x.b)>=10000))){
+      x.unit="agorot";
+    }else if(!x.unit){
+      x.unit="ils";
+    }
+  }else{
+    x.unit="usd";
+  }
+});
+const ils=n=>new Intl.NumberFormat("he-IL",{style:"currency",currency:"ILS",maximumFractionDigits:2}).format(n);
+function val(x){return x.q*x.p*(x.c=="$"?x.fx:1)}
+function render(){
+ let pv=state.holdings.reduce((a,x)=>a+val(x),0),m=state.money;
+ let out=m.checking+m.cash+m.deposits+m.receivable+m.bit+m.child,total=pv+out;
+ net.textContent=ils(total);document.getElementById("pv").textContent=ils(pv);outside.textContent=ils(out);
+ checking.textContent=ils(m.checking);cash.textContent=ils(m.cash);dep.textContent=ils(m.deposits);rec.textContent=ils(m.receivable);bit.textContent=ils(m.bit);child.textContent=ils(m.child);
+ holdings.innerHTML=state.holdings.map((x,i)=>{let v=val(x),cost=x.q*x.b*(x.c=="$"?x.fx:1),pnl=v-cost,pp=cost?pnl/cost*100:0,pct=pv?v/pv*100:0;return `<div class="card holding"><div class="logo">${x.s.slice(0,4)}</div><div class="grow"><div class="name">${x.name}</div><div class="sub">${x.s} · ${x.q} יח׳ · מחיר ${x.c}${x.p}</div><div class="progress"><div class="bar" style="width:${Math.min(100,pct)}%"></div></div></div><div class="right"><div class="value">${ils(v)}</div><div class="${pnl>=0?'green':'red'}" style="font-size:12px;margin-top:3px">${pnl>=0?'+':''}${ils(pnl)} · ${pnl>=0?'+':''}${pp.toFixed(2)}%</div><button class="secondary" style="padding:5px 8px;font-size:11px;margin-top:6px" onclick="editHolding(${i})">ערוך</button></div></div>`}).join("");
+ goals.innerHTML=state.goals.map((g,i)=>{let pct=Math.min(100,total/g.target*100);return `<div class="card"><div class="head"><div><div class="name">${g.name}</div><div class="sub">${ils(total)} מתוך ${ils(g.target)}</div></div><b>${pct.toFixed(1)}%</b></div><div class="progress"><div class="bar" style="width:${pct}%"></div></div><div class="actions" style="margin-top:9px"><button class="secondary" onclick="editGoal(${i})">ערוך</button><button class="danger" onclick="delGoal(${i})">מחק</button></div></div>`}).join("");
+ localStorage.setItem("myMoneyFinal",JSON.stringify(state));renderWatch();
+}
+function renderWatch(){let q=(search.value||"").toLowerCase();watch.innerHTML=watchData.filter(x=>x[0].toLowerCase().includes(q)||x[1].toLowerCase().includes(q)).map(x=>`<div class="card watchrow"><div class="logo">${x[0].slice(0,4)}</div><div class="grow"><div class="name">${x[1]}</div><div class="sub">${x[0]} · USD</div></div><div class="right">${x[2]?`<div class="price">$${x[2].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`:`<div class="sub">אין שער נטען</div>`}</div></div>`).join("")}
+function openHolding(i=null){mtitle.textContent=i===null?"הוספת השקעה":"עריכת השקעה";let x=i===null?{s:"",name:"",q:"",b:"",p:"",c:"$",fx:3.4}:state.holdings[i];form.innerHTML=`<div class="field"><label>סימול / מספר נייר</label><input id="fs" value="${x.s}"></div><div class="field"><label>שם</label><input id="fn" value="${x.name}"></div><div class="row"><div class="field"><label>כמות</label><input id="fq" type="number" step="any" value="${x.q}"></div><div class="field"><label>מטבע</label><select id="fc"><option ${x.c=="₪"?"selected":""}>₪</option><option ${x.c=="$"?"selected":""}>$</option></select></div><div class="field"><label>מחיר קנייה ממוצע</label><input id="fb" type="number" step="any" value="${x.b}"></div><div class="field"><label>מחיר נוכחי</label><input id="fp" type="number" step="any" value="${x.p}"></div><div class="field"><label>שער דולר</label><input id="ffx" type="number" step="any" value="${x.fx}"></div></div><p class="note">אחרי השמירה יוצגו אוטומטית הרווח/הפסד בש״ח ובאחוזים.</p><div class="actions"><button class="primary" onclick="saveHolding(${i===null?-1:i})">שמור</button>${i!==null?'<button class="danger" onclick="delHolding('+i+')">מחק</button>':""}</div>`;modal.classList.add("show")}
+function saveHolding(i){let x={s:fs.value.trim(),name:fn.value.trim()||fs.value.trim(),q:+fq.value,b:+fb.value,p:+fp.value,c:fc.value,fx:+ffx.value||3.4};if(!x.s)return;if(i<0)state.holdings.push(x);else state.holdings[i]=x;render();closeModal();toast("נשמר ✓")}
+function editHolding(i){openHolding(i)}function delHolding(i){if(confirm("למחוק את ההשקעה?")){state.holdings.splice(i,1);render();closeModal()}}
+function openMoney(){let m=state.money;mtitle.textContent="הון מחוץ לשוק";form.innerHTML=`<div class="row">${mf("עו״ש","m1",m.checking)}${mf("מזומן","m2",m.cash)}${mf("פיקדונות","m3",m.deposits)}${mf("חייבים לי","m4",m.receivable)}${mf("Bit","m5",m.bit)}${mf("חיסכון לכל ילד","m6",m.child)}</div><br><button class="primary" onclick="saveMoney()">שמור</button>`;modal.classList.add("show")}
+function mf(l,id,v){return `<div class="field"><label>${l}</label><input id="${id}" type="number" step="any" value="${v}"></div>`}
+function saveMoney(){state.money={checking:+m1.value,cash:+m2.value,deposits:+m3.value,receivable:+m4.value,bit:+m5.value,child:+m6.value};render();closeModal();toast("נשמר ✓")}
+function openGoal(i=null){mtitle.textContent=i===null?"הוספת יעד":"עריכת יעד";let g=i===null?{name:"",target:""}:state.goals[i];form.innerHTML=`<div class="field"><label>שם היעד</label><input id="gn" value="${g.name}" placeholder="למשל מיליון ₪"></div><div class="field"><label>סכום היעד</label><input id="gt" type="number" step="any" value="${g.target}"></div><button class="primary" onclick="saveGoal(${i===null?-1:i})">שמור</button>`;modal.classList.add("show")}
+function saveGoal(i){let g={name:gn.value.trim(),target:+gt.value};if(!g.name||!g.target)return;if(i<0)state.goals.push(g);else state.goals[i]=g;render();closeModal();toast("יעד נשמר ✓")}
+function editGoal(i){openGoal(i)}function delGoal(i){if(confirm("למחוק יעד?")){state.goals.splice(i,1);render()}}
+function backup(){let b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="my-money-backup.json";a.click();toast("גיבוי נוצר")}
+function fixIsraeliPrices(){
+  state.holdings.forEach(x=>{
+    if(x.c==="₪" && (x.s==="1159250" || x.s==="1146570" || +x.p>=10000 || +x.b>=10000)) x.unit="agorot";
+  });
+  render();
+  toast("מחירי הניירות הישראליים תוקנו ✓");
+}
+function resetAll(){if(confirm("למחוק את כל הנתונים?")){localStorage.removeItem("myMoneyFinal");location.reload()}}
+function closeModal(){modal.classList.remove("show")}function toast(t){toastEl.textContent=t;toastEl.style.display="block";setTimeout(()=>toastEl.style.display="none",1700)}
+const toastEl=document.getElementById("toast");
+async function loadMarketPrices(){
+  try{
+    const r=await fetch("prices.json?ts="+Date.now(),{cache:"no-store"});
+    if(!r.ok)return;
+    const prices=await r.json();
+    state.holdings.forEach(x=>{
+      const key=x.s.toUpperCase();
+      if(prices[key] && typeof prices[key].price==="number"){
+        x.p=prices[key].price;
+        if(x.c==="$" && prices[key].currency) x.c=prices[key].currency;
+      }
+    });
+    render();
+  }catch(e){}
+}
+render(); loadMarketPrices();
+setInterval(loadMarketPrices, 15*60*1000);
+</script>
+</body></html>
