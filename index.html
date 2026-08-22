@@ -81,6 +81,23 @@ function editGoal(i){openGoal(i)}function delGoal(i){if(confirm("למחוק יע
 function backup(){let b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="my-money-backup.json";a.click();toast("גיבוי נוצר")}
 function resetAll(){if(confirm("למחוק את כל הנתונים?")){localStorage.removeItem("myMoneyFinal");location.reload()}}
 function closeModal(){modal.classList.remove("show")}function toast(t){toastEl.textContent=t;toastEl.style.display="block";setTimeout(()=>toastEl.style.display="none",1700)}
-const toastEl=document.getElementById("toast");render();
+const toastEl=document.getElementById("toast");
+async function loadMarketPrices(){
+  try{
+    const r=await fetch("prices.json?ts="+Date.now(),{cache:"no-store"});
+    if(!r.ok)return;
+    const prices=await r.json();
+    state.holdings.forEach(x=>{
+      const key=x.s.toUpperCase();
+      if(prices[key] && typeof prices[key].price==="number"){
+        x.p=prices[key].price;
+        if(x.c==="$" && prices[key].currency) x.c=prices[key].currency;
+      }
+    });
+    render();
+  }catch(e){}
+}
+render(); loadMarketPrices();
+setInterval(loadMarketPrices, 15*60*1000);
 </script>
 </body></html>
